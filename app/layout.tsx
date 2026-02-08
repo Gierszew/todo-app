@@ -28,6 +28,15 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
+        <footer className="w-full py-6 border-t text-center text-slate-500 text-sm">
+          <p>
+            Done by <span className="font-semibold text-slate-800">Gierszew</span>
+          </p>
+          <p className="mt-2 text-[10px] uppercase tracking-wider opacity-70 max-w-xs mx-auto">
+            <span className="font-bold text-amber-600">Note:</span> Portfolio project. 
+            Do not enter sensitive data.
+          </p>
+        </footer>
       </body>
     </html>
   );

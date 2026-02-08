@@ -6,13 +6,11 @@ import {
   addDoc, 
   onSnapshot, 
   query, 
-  orderBy, 
-  doc, 
-  deleteDoc, 
-  updateDoc, 
+  orderBy,
   where
 } from "firebase/firestore";
 import { v4 as uuidv4 } from "uuid";
+import TodoElement from "./todoelement";
 
 interface Todo {
     id: string;
@@ -77,72 +75,37 @@ export default function TodoPage() {
         setDescription("");
     };
 
-    // change status
-    const toggleTodo = async (id: string, isComplete: boolean) => {
-        const todoRef = doc(db, "todo", id);
-        await updateDoc(todoRef, {
-            isComplete: !isComplete
-        });
-    };
-
-    // delete task
-    const deleteTodo = async (id: string) => {
-        await deleteDoc(doc(db, "todo", id));
-    };
+   
 
     return (
     <div className="max-w-2xl mx-auto p-6 font-sans text-slate-800">
-      <h1 className="text-3xl font-bold mb-8 border-b pb-2">Lista zadań</h1>
+      <h1 className="text-3xl font-bold mb-8 border-b pb-2 text-amber-400">Your todo list</h1>
 
-      {/* Formularz dodawania */}
+      {/* Add task form */}
       <form onSubmit={addTodo} className="bg-slate-50 p-4 rounded-lg mb-8 shadow-sm border">
         <div className="flex flex-col gap-3">
           <input 
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="Tytuł zadania..."
+            placeholder="Title of the task"
             className="p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"
           />
           <textarea 
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Opis (opcjonalnie)..."
+            placeholder="Description (optional)"
             className="p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none h-20"
           />
           <button type="submit" className="bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">
-            Dodaj zadanie
+            Add task
           </button>
         </div>
       </form>
 
-      {/* Lista zadań */}
+      {/* List of the tasks */}
       <div className="space-y-4">
         {todos.map(todo => (
-          <div 
-            key={todo.id} 
-            className={`p-4 border rounded-lg flex items-start justify-between transition ${todo.isComplete ? 'bg-gray-50 opacity-60' : 'bg-white shadow-sm'}`}
-          >
-            <div className="flex gap-4">
-              <input 
-                type="checkbox" 
-                checked={todo.isComplete} 
-                onChange={() => toggleTodo(todo.id, todo.isComplete)}
-                className="mt-1.5 h-5 w-5 cursor-pointer"
-              />
-              <div>
-                <h3 className={`font-semibold text-lg ${todo.isComplete ? 'line-through' : ''}`}>
-                  {todo.title}
-                </h3>
-                <p className="text-slate-600 text-sm">{todo.description}</p>
-              </div>
-            </div>
-            <button 
-              onClick={() => deleteTodo(todo.id)}
-              className="text-red-500 hover:bg-red-50 p-2 rounded transition"
-            >
-              Usuń
-            </button>
-          </div>
+          <TodoElement key={todo.id} todo={todo} />
         ))}
       </div>
     </div>
