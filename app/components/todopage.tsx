@@ -11,6 +11,7 @@ import {
 } from "firebase/firestore";
 import { v4 as uuidv4 } from "uuid";
 import TodoElement from "./todoelement";
+import {getAuth, onAuthStateChanged, signInAnonymously} from "@firebase/auth";
 
 interface Todo {
     id: string;
@@ -28,12 +29,21 @@ export default function TodoPage() {
 
     // init "account"
     useEffect(() => {
-        let id = localStorage.getItem("todo_user_id");
-        if (!id) {
-            id = uuidv4();
-            localStorage.setItem("todo_user_id", id);
-        }
-        setUserId(id);
+        const auth = getAuth();
+
+        // Sprawdź czy użytkownik już jest zalogowany
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                setUserId(user.uid); // Używamy UID od Firebase zamiast uuidv4
+            } else {
+                // Jeśli nie, zaloguj go anonimowo
+                signInAnonymously(auth).then((result) => {
+                    setUserId(result.user.uid);
+                });
+            }
+        });
+
+        return () => unsubscribe();
     }, []);
 
     // RT
