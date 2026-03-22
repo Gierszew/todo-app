@@ -67,22 +67,27 @@ export default function TodoPage() {
         return () => unsubscribe(); // clean
     }, [userId]);
 
-    // add task
-    const addTodo = async (e: React.SubmitEvent) => {
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const addTodo = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!title.trim() || !userId || isSubmitting) return;
 
-        if (!title.trim()) return;
+        setIsSubmitting(true); // Blokujemy
 
-        await addDoc(collection(db, "todo"), {
-            userId: userId,
-            title: title,
-            description: description,
-            isComplete: false,
-            order: todos.length + 1
-        });
-
-        setTitle("");
-        setDescription("");
+        try {
+            await addDoc(collection(db, "todo"), {
+                userId: userId,
+                title: title,
+                description: description,
+                isComplete: false,
+                order: todos.length + 1
+            });
+            setTitle("");
+            setDescription("");
+        } finally {
+            // Odblokowujemy po 2 sekundach
+            setTimeout(() => setIsSubmitting(false), 2000);
+        }
     };
 
    
@@ -106,9 +111,12 @@ export default function TodoPage() {
             placeholder="Description (optional)"
             className="p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none h-20"
           />
-          <button type="submit" className="bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">
-            Add task
-          </button>
+            <button
+                disabled={isSubmitting}
+                className={`${isSubmitting ? 'bg-gray-400' : 'bg-blue-600'} text-white ...`}
+            >
+                {isSubmitting ? "Wait..." : "Add task"}
+            </button>
         </div>
       </form>
 
